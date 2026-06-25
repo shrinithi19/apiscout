@@ -2,7 +2,7 @@ flask
 requests
 beautifulsoup4
 chromadb
-google-genai
+google-generativeai
 python-dotenv
 sentence-transformers
 lxml

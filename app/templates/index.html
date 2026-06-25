@@ -292,6 +292,7 @@
       <div class="sb-item" onclick="switchTab('auth', this)"><i class="ti ti-lock"></i> Authentication</div>
       <div class="sb-item" onclick="switchTab('wrapper', this)"><i class="ti ti-code"></i> Wrapper code</div>
       <div class="sb-item" onclick="switchTab('nl', this)"><i class="ti ti-message-code"></i> Ask in english</div>
+      <div class="sb-item" onclick="switchTab('changelog', this)"><i class="ti ti-git-compare"></i> Changelog</div>
       <div class="sb-item" onclick="switchTab('guide', this)"><i class="ti ti-book"></i> Guide</div>
       <div class="sb-divider"></div>
       <div class="sb-label">API Details</div>
@@ -393,6 +394,108 @@
         </div>
       </div>
 
+      <!-- CHANGELOG TAB -->
+      <div class="tab-panel" id="tab-changelog">
+        <div class="panel" style="margin-bottom:10px">
+          <div class="panel-head">
+            <div class="panel-title"><i class="ti ti-git-compare"></i> API Changelog Detector</div>
+        </div>
+        <div class="panel-body">
+          <p style="font-size:12px;color:var(--text4);margin-bottom:14px;line-height:1.6;">Compare two versions of the same API documentation to detect what changed — new endpoints, removed routes, modified parameters.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div>
+               <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text5);margin-bottom:6px;">Old version URL</div>
+               <div class="url-bar" style="border-radius:7px;">
+               <div class="url-ico"><i class="ti ti-link"></i></div>
+                <input class="url-input" id="oldUrl" placeholder="https://api.example.com/v1/docs" style="padding:10px 13px;font-size:12px;" />
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text5);margin-bottom:6px;">New version URL</div>
+            <div class="url-bar" style="border-radius:7px;">
+              <div class="url-ico"><i class="ti ti-link"></i></div>
+              <input class="url-input" id="newUrl" placeholder="https://api.example.com/v2/docs" style="padding:10px 13px;font-size:12px;" />
+            </div>
+          </div>
+        </div>
+        <button class="scout-btn" style="border-radius:7px;" onclick="detectChangelog()">
+          <i class="ti ti-git-compare"></i> Detect Changes
+        </button>
+        <div class="loading" id="changelogLoading" style="margin-top:10px;">
+          <div class="spinner"></div>
+          <span>Comparing API versions...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHANGELOG STATS -->
+    <div id="changelogStats" style="display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">
+      <div class="panel" style="text-align:center;padding:14px;">
+        <div style="font-size:22px;font-weight:600;color:#4ade80;" id="clAdded">0</div>
+        <div style="font-size:11px;color:var(--text5);margin-top:2px;">Added</div>
+      </div>
+      <div class="panel" style="text-align:center;padding:14px;">
+        <div style="font-size:22px;font-weight:600;color:#f87171;" id="clRemoved">0</div>
+        <div style="font-size:11px;color:var(--text5);margin-top:2px;">Removed</div>
+      </div>
+      <div class="panel" style="text-align:center;padding:14px;">
+        <div style="font-size:22px;font-weight:600;color:#fbbf24;" id="clModified">0</div>
+        <div style="font-size:11px;color:var(--text5);margin-top:2px;">Modified</div>
+      </div>
+      <div class="panel" style="text-align:center;padding:14px;">
+        <div style="font-size:22px;font-weight:600;color:var(--purple-dim);" id="clUnchanged">0</div>
+        <div style="font-size:11px;color:var(--text5);margin-top:2px;">Unchanged</div>
+      </div>
+     </div>
+
+    <!-- CHANGELOG SUMMARY -->
+    <div class="panel" id="changelogSummary" style="display:none;margin-bottom:10px;">
+      <div class="panel-head">
+        <div class="panel-title"><i class="ti ti-message"></i> AI Summary</div>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:13px;color:var(--text3);line-height:1.7;" id="changelogSummaryText"></p>
+      </div>
+    </div>
+
+    <!-- CHANGELOG RESULTS -->
+    <div id="changelogResults" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+
+        <!-- ADDED -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title" style="color:#4ade80;"><i class="ti ti-plus"></i> Added Endpoints</div>
+          </div>
+          <div class="panel-body" id="clAddedList">
+            <div class="no-data" style="padding:10px 0;">None</div>
+          </div>
+        </div>
+
+        <!-- REMOVED -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title" style="color:#f87171;"><i class="ti ti-minus"></i> Removed Endpoints</div>
+          </div>
+          <div class="panel-body" id="clRemovedList">
+            <div class="no-data" style="padding:10px 0;">None</div>
+          </div>
+        </div>
+
+        <!-- MODIFIED -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title" style="color:#fbbf24;"><i class="ti ti-edit"></i> Modified Endpoints</div>
+          </div>
+          <div class="panel-body" id="clModifiedList">
+           <div class="no-data" style="padding:10px 0;">None</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
       <!-- GUIDE TAB -->
       <div class="tab-panel" id="tab-guide">
         <div class="guide-panel">
@@ -457,8 +560,12 @@
 
     // ─── SCOUT API ───────────────────────────────────────────
     async function scoutAPI() {
-      const url = document.getElementById('urlInput').value.trim();
+      let url = document.getElementById('urlInput').value.trim();
       if (!url) { showToast('Please enter a documentation URL', true); return; }
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          url = 'https://' + url;
+          document.getElementById('urlInput').value = url;
+      }
 
       const btn = document.getElementById('scoutBtn');
       const loading = document.getElementById('loadingMsg');
@@ -547,8 +654,8 @@
       document.getElementById('authFull').innerHTML = authHtml;
 
       // Wrapper code
-      document.getElementById('wrapperCode').innerHTML = highlightCode(data.wrapper_code || '# No wrapper generated');
-
+      const rawCode = data.wrapper_code || '# No wrapper generated';
+      document.getElementById('wrapperCode').innerHTML = highlightCode(rawCode);
       // NL examples
       const exampleQuery = `"get me ${info.api_name || 'data'} for a specific location"`;
       ['nlExamples', 'nlExamples2'].forEach(id => {
@@ -619,6 +726,85 @@
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
       a.download = 'wrapper.py'; a.click();
     }
+
+    // ─── CHANGELOG ───────────────────────────────────────
+    async function detectChangelog() {
+       const oldUrl = document.getElementById('oldUrl').value.trim();
+       const newUrl = document.getElementById('newUrl').value.trim();
+
+       if (!oldUrl || !newUrl) { showToast('Please enter both URLs', true); return; }
+
+       const loading = document.getElementById('changelogLoading');
+       loading.classList.add('show');
+       document.getElementById('changelogStats').style.display = 'none';
+       document.getElementById('changelogSummary').style.display = 'none';
+       document.getElementById('changelogResults').style.display = 'none';
+
+       try {
+        const res = await fetch('/changelog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ old_url: oldUrl, new_url: newUrl })
+       });
+       const data = await res.json();
+       if (data.error) throw new Error(data.error);
+
+    // Stats
+       document.getElementById('clAdded').textContent = data.stats.added;
+       document.getElementById('clRemoved').textContent = data.stats.removed;
+       document.getElementById('clModified').textContent = data.stats.modified;
+       document.getElementById('clUnchanged').textContent = data.stats.unchanged;
+       document.getElementById('changelogStats').style.display = 'grid';
+
+    // Summary
+       document.getElementById('changelogSummaryText').textContent = data.summary;
+       document.getElementById('changelogSummary').style.display = 'block';
+
+    // Added
+       document.getElementById('clAddedList').innerHTML = data.added.length === 0
+        ? '<div class="no-data" style="padding:10px 0;">None</div>'
+        : data.added.map(ep => `
+           <div class="ep-row">
+             <div><span class="method get">${ep.method}</span></div>
+             <div>
+               <div class="ep-path">${ep.path}</div>
+               <div class="ep-desc">${ep.description}</div>
+             </div>
+           </div>`).join('');
+
+    // Removed
+        document.getElementById('clRemovedList').innerHTML = data.removed.length === 0
+          ? '<div class="no-data" style="padding:10px 0;">None</div>'
+          : data.removed.map(ep => `
+            <div class="ep-row">
+              <div><span class="method delete">DEL</span></div>
+              <div>
+                <div class="ep-path" style="color:#f87171;">${ep.path}</div>
+                <div class="ep-desc">${ep.description}</div>
+              </div>
+            </div>`).join('');
+
+    // Modified
+        document.getElementById('clModifiedList').innerHTML = data.modified.length === 0
+          ? '<div class="no-data" style="padding:10px 0;">None</div>'
+          : data.modified.map(ep => `
+            <div class="ep-row">
+              <div><span class="method" style="background:#2e1f0a;color:#fbbf24;border:0.5px solid #4a3010;font-size:10px;padding:3px 0;border-radius:5px;text-align:center;width:36px;">MOD</span></div>
+              <div>
+                <div class="ep-path" style="color:#fbbf24;">${ep.path}</div>
+                ${ep.added_params.length ? `<div class="ep-desc" style="color:#4ade80;">+ ${ep.added_params.join(', ')}</div>` : ''}
+                ${ep.removed_params.length ? `<div class="ep-desc" style="color:#f87171;">- ${ep.removed_params.join(', ')}</div>` : ''}
+              </div>
+            </div>`).join('');
+
+        document.getElementById('changelogResults').style.display = 'block';
+        showToast('Changelog detected!');
+
+      } catch(e) {
+        showToast('Error: ' + e.message, true);
+      } finally {
+        loading.classList.remove('show');
+    }}
 
     function showToast(msg, isError=false) {
       const t = document.getElementById('toast');

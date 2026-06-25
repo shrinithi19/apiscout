@@ -1,14 +1,15 @@
-from google import genai
+import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 import time
-from utils.key_manager import key_manager
 
 load_dotenv()
 
 def get_client():
-    return genai.Client(api_key=key_manager.get_next_key())
-
+    from utils.key_manager import key_manager
+    key = key_manager.get_next_key()
+    genai.configure(api_key=key)
+    return genai.GenerativeModel("gemini-2.5-flash")
 
 def generate_wrapper(api_info: dict) -> str:
     """
@@ -61,10 +62,7 @@ Generate ONLY the Python code, no explanation, no markdown backticks.
 
     for attempt in range(3):
         try:
-            response = get_client().models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
+            response = get_client().generate_content(prompt)
             return response.text.strip()
 
         except Exception as e:

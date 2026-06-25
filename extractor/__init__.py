@@ -1,15 +1,16 @@
-from google import genai
+import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 import json
 import time
-from utils.key_manager import key_manager
 
 load_dotenv()
 
 def get_client():
-    """Gets a Gemini client with the next available API key"""
-    return genai.Client(api_key=key_manager.get_next_key())
+    from utils.key_manager import key_manager
+    key = key_manager.get_next_key()
+    genai.configure(api_key=key)
+    return genai.GenerativeModel("gemini-2.5-flash")
 
 def extract_api_info(chunks: list[str]) -> dict:
     """
@@ -56,10 +57,7 @@ Return ONLY the JSON object, no explanation, no markdown, no extra text.
 
     for attempt in range(3):
         try:
-            response = get_client().models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
+            response = get_client().generate_content(prompt)
             raw = response.text.strip()
 
             # Clean up if Gemini wraps in markdown

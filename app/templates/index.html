@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APIScout — Smart DevTool for API Integration</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #0c0c12;
+      --bg3: #0e0e16;
+      --bg4: #111120;
+      --border: #1a1a28;
+      --border2: #1e1e2e;
+      --border3: #2a2a3e;
+      --purple: #7c3aed;
+      --purple-light: #a855f7;
+      --purple-dim: #c4b5fd;
+      --purple-bg: #1a1028;
+      --purple-border: #3a1a5e;
+      --text: #e0e0e8;
+      --text2: #ccc;
+      --text3: #888;
+      --text4: #666;
+      --text5: #555;
+      --text6: #444;
+      --text7: #3a3a5e;
+      --green: #4ade80;
+      --green-bg: #0d2e1a;
+      --green-border: #1a4a28;
+      --pink: #f472b6;
+      --pink-bg: #2e1a28;
+      --pink-border: #4a1a38;
+      --blue: #7dd3fc;
+      --font: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border3); border-radius: 99px; }
+
+    /* TOPBAR */
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 13px 28px; border-bottom: 0.5px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #7c3aed, #a855f7); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .brand-icon i { font-size: 16px; color: #fff; }
+    .brand-name { font-size: 15px; font-weight: 600; color: #fff; }
+    .top-pills { display: flex; gap: 6px; }
+    .pill { font-size: 11px; padding: 4px 10px; border-radius: 99px; border: 0.5px solid var(--border3); color: var(--text3); display: flex; align-items: center; gap: 5px; background: var(--bg3); }
+    .pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple-light); }
+
+    /* HERO */
+    .hero { display: grid; grid-template-columns: 1fr 260px; padding: 44px 28px 36px; border-bottom: 0.5px solid var(--border); background: var(--bg); gap: 0; }
+    .hero-left { padding-right: 40px; }
+    .hero-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--purple); margin-bottom: 16px; }
+    .hero-title { font-size: 36px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 16px; }
+    .hero-title .dim { color: var(--text6); }
+    .hero-sub { font-size: 14px; color: var(--text4); margin-bottom: 28px; max-width: 500px; line-height: 1.75; }
+    .url-bar { display: flex; align-items: center; border: 0.5px solid var(--border3); border-radius: 10px; background: var(--bg3); overflow: hidden; transition: border-color 0.2s; }
+    .url-bar:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+    .url-ico { padding: 0 13px; display: flex; align-items: center; border-right: 0.5px solid var(--border2); flex-shrink: 0; }
+    .url-ico i { font-size: 15px; color: var(--text5); }
+    .url-input { flex: 1; padding: 13px 13px; font-size: 13px; font-family: var(--mono); background: transparent; border: none; color: var(--text2); outline: none; min-width: 0; }
+    .url-input::placeholder { color: var(--text6); }
+    .scout-btn { padding: 13px 22px; background: var(--purple); color: #fff; border: none; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
+    .scout-btn:hover { background: #6d28d9; }
+    .scout-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .hero-right { border-left: 0.5px solid var(--border); padding-left: 28px; }
+    .whats-new-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--purple); display: flex; align-items: center; gap: 7px; margin-bottom: 14px; }
+    .whats-new-label::before { content:''; display:inline-block; width:8px; height:8px; background:var(--purple); border-radius:2px; }
+    .whats-new-item { padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; color: var(--text3); line-height: 1.4; }
+    .whats-new-item:last-child { border-bottom: none; }
+    .whats-new-item span { color: var(--purple-dim); font-size: 11px; display: block; margin-top: 2px; }
+
+    /* META BAR */
+    .meta-bar { display: grid; grid-template-columns: repeat(4,1fr); border-bottom: 0.5px solid var(--border); background: var(--bg2); }
+    .meta-cell { padding: 14px 24px; border-right: 0.5px solid var(--border); display: flex; align-items: center; gap: 11px; }
+    .meta-cell:last-child { border-right: none; }
+    .meta-ico { width: 28px; height: 28px; border: 0.5px solid var(--purple-border); border-radius: 7px; background: var(--purple-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .meta-ico i { font-size: 13px; color: var(--purple-light); }
+    .meta-val { font-size: 14px; font-weight: 500; color: #fff; }
+    .meta-lbl { font-size: 11px; color: var(--text5); margin-top: 1px; }
+
+    /* MAIN LAYOUT */
+    .main { display: grid; grid-template-columns: 190px 1fr; min-height: calc(100vh - 340px); }
+
+    /* SIDEBAR */
+    .sidebar { border-right: 0.5px solid var(--border); background: var(--bg2); padding: 14px 0; position: sticky; top: 57px; height: fit-content; }
+    .sb-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text7); padding: 0 14px; margin-bottom: 4px; margin-top: 14px; }
+    .sb-label:first-child { margin-top: 0; }
+    .sb-item { display: flex; align-items: center; gap: 9px; padding: 8px 14px; font-size: 13px; color: var(--text5); cursor: pointer; transition: color 0.15s; border-right: 2px solid transparent; }
+    .sb-item:hover { color: var(--text3); }
+    .sb-item.active { background: var(--purple-bg); color: var(--purple-dim); border-right: 2px solid var(--purple); }
+    .sb-item i { font-size: 15px; flex-shrink: 0; }
+    .sb-badge { margin-left: auto; font-size: 10px; background: var(--purple-bg); border: 0.5px solid var(--purple-border); border-radius: 99px; padding: 2px 7px; color: var(--purple); }
+    .sb-divider { height: 0.5px; background: var(--border); margin: 10px 14px; }
+    .sb-info { padding: 5px 14px; font-size: 12px; color: var(--text6); display: flex; align-items: center; gap: 7px; }
+    .sb-info i { font-size: 13px; color: var(--text7); }
+
+    /* CONTENT */
+    .content { padding: 18px 20px; background: var(--bg); }
+
+    /* TAB PANELS */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* SIDE PANELS */
+    .side-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .panel { border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; background: var(--bg3); }
+    .panel-head { padding: 9px 13px; border-bottom: 0.5px solid var(--border); background: var(--bg4); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text5); display: flex; align-items: center; gap: 6px; }
+    .panel-title i { font-size: 13px; color: var(--purple); }
+    .panel-action { font-size: 11px; color: var(--text5); cursor: pointer; display: flex; align-items: center; gap: 4px; border: 0.5px solid var(--border3); padding: 3px 8px; border-radius: 5px; background: var(--bg3); transition: color 0.15s; }
+    .panel-action:hover { color: var(--purple-dim); border-color: var(--purple-border); }
+    .panel-body { padding: 12px; }
+
+    /* ENDPOINTS */
+    .ep-row { padding: 9px 0; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 44px 1fr; gap: 9px; }
+    .ep-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .method { font-size: 10px; font-weight: 600; padding: 3px 0; border-radius: 5px; text-align: center; width: 36px; }
+    .get { background: var(--green-bg); color: var(--green); border: 0.5px solid var(--green-border); }
+    .post { background: var(--pink-bg); color: var(--pink); border: 0.5px solid var(--pink-border); }
+    .put { background: #1e2a0a; color: #a3e635; border: 0.5px solid #2a4a10; }
+    .delete { background: #2e0a0a; color: #f87171; border: 0.5px solid #4a1010; }
+    .ep-path { font-family: var(--mono); font-size: 12px; color: var(--purple-dim); font-weight: 500; }
+    .ep-desc { font-size: 11px; color: var(--text5); margin-top: 3px; line-height: 1.5; }
+    .ep-params { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 3px; }
+    .param { font-size: 10px; font-family: var(--mono); padding: 2px 6px; border-radius: 4px; border: 0.5px solid #222; color: var(--text5); background: #111; }
+    .param.req { border-color: var(--pink-border); color: var(--pink); background: var(--pink-bg); }
+    .no-data { font-size: 13px; color: var(--text5); padding: 20px 0; text-align: center; }
+    .no-data i { font-size: 28px; display: block; margin-bottom: 8px; color: var(--text7); }
+
+    /* AUTH */
+    .auth-block { padding: 10px; border: 0.5px solid var(--border2); border-radius: 8px; margin-bottom: 8px; background: var(--bg4); }
+    .auth-block:last-child { margin-bottom: 0; }
+    .auth-type { font-size: 13px; font-weight: 500; color: var(--text2); display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+    .auth-type i { font-size: 14px; color: var(--purple); }
+    .auth-detail { font-size: 11px; color: var(--text5); line-height: 1.6; }
+    .auth-tag { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 11px; background: var(--purple-bg); border: 0.5px solid var(--purple-border); border-radius: 5px; padding: 3px 8px; color: var(--purple-light); margin-top: 7px; }
+
+    /* WRAPPER CODE */
+    .code-panel { border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; background: var(--bg3); }
+    .code-panel-head { padding: 9px 13px; border-bottom: 0.5px solid var(--border); background: var(--bg4); display: flex; align-items: center; justify-content: space-between; }
+    .code-actions { display: flex; gap: 6px; }
+    .code-btn { font-size: 11px; color: var(--text5); cursor: pointer; display: flex; align-items: center; gap: 4px; border: 0.5px solid var(--border3); padding: 4px 10px; border-radius: 5px; background: var(--bg3); transition: all 0.15s; }
+    .code-btn:hover { color: var(--purple-dim); border-color: var(--purple-border); }
+    .code-btn.primary { background: var(--purple-bg); color: var(--purple-dim); border-color: var(--purple-border); }
+    pre.code-blk { background: var(--bg4); padding: 16px; font-family: var(--mono); font-size: 12px; line-height: 1.75; color: var(--text2); overflow-x: auto; max-height: 420px; overflow-y: auto; white-space: pre; }
+
+    /* NL PANEL */
+    .nl-panel { border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; background: var(--bg3); margin-top: 10px; }
+    .nl-head { padding: 9px 13px; border-bottom: 0.5px solid var(--border); background: var(--bg4); display: flex; align-items: center; gap: 8px; }
+    .nl-head i { font-size: 14px; color: var(--purple); }
+    .nl-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text5); }
+    .nl-body { display: grid; grid-template-columns: 1fr 1fr; }
+    .nl-left { padding: 13px; border-right: 0.5px solid var(--border); }
+    .nl-right { padding: 13px; }
+    .nl-irow { display: flex; gap: 7px; margin-bottom: 9px; }
+    .nl-irow input { flex: 1; padding: 9px 11px; font-size: 12px; border: 0.5px solid var(--border3); border-radius: 7px; background: var(--bg4); color: var(--text2); outline: none; font-family: var(--font); transition: border-color 0.2s; }
+    .nl-irow input:focus { border-color: var(--purple); }
+    .nl-irow input::placeholder { color: var(--text6); }
+    .nl-btn { padding: 9px 13px; background: var(--purple); color: #fff; border: none; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 5px; white-space: nowrap; transition: background 0.15s; }
+    .nl-btn:hover { background: #6d28d9; }
+    .nl-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .nl-examples { display: flex; flex-direction: column; gap: 5px; }
+    .nl-eg { font-size: 11px; color: var(--text5); padding: 6px 9px; border: 0.5px solid var(--border2); border-radius: 6px; cursor: pointer; font-style: italic; background: var(--bg4); transition: all 0.15s; }
+    .nl-eg:hover { border-color: var(--purple); color: var(--purple-light); }
+    .out-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text5); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .out-lbl i { font-size: 13px; color: var(--purple); }
+    pre.nl-code { background: var(--bg4); border: 0.5px solid var(--border2); border-radius: 8px; padding: 11px 13px; font-family: var(--mono); font-size: 12px; line-height: 1.75; color: var(--text2); overflow-x: auto; white-space: pre; min-height: 80px; }
+
+    /* GUIDE PANEL */
+    .guide-panel { border: 0.5px solid var(--border2); border-radius: 10px; overflow: hidden; background: var(--bg3); }
+    .guide-head { padding: 9px 13px; border-bottom: 0.5px solid var(--border); background: var(--bg4); display: flex; align-items: center; gap: 8px; }
+    .guide-head i { font-size: 14px; color: var(--purple); }
+    .guide-head-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text5); }
+    .guide-body { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .guide-col { padding: 16px; border-right: 0.5px solid var(--border); }
+    .guide-col:last-child { border-right: none; }
+    .guide-col-title { font-size: 11px; font-weight: 600; color: var(--purple-dim); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .guide-col-title i { font-size: 14px; color: var(--purple); }
+    .guide-step { display: flex; gap: 9px; margin-bottom: 10px; align-items: flex-start; }
+    .guide-step:last-child { margin-bottom: 0; }
+    .step-num { width: 18px; height: 18px; border-radius: 50%; background: var(--purple-bg); border: 0.5px solid var(--purple-border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--purple-light); flex-shrink: 0; margin-top: 2px; }
+    .step-text { font-size: 12px; color: var(--text4); line-height: 1.55; }
+    .step-text strong { color: var(--text2); font-weight: 500; }
+    .outcome-item { display: flex; gap: 8px; margin-bottom: 9px; align-items: flex-start; }
+    .outcome-item:last-child { margin-bottom: 0; }
+    .outcome-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); margin-top: 5px; flex-shrink: 0; }
+    .outcome-text { font-size: 12px; color: var(--text4); line-height: 1.55; }
+    .outcome-text strong { color: var(--text2); font-weight: 500; }
+
+    /* LOADING SPINNER */
+    .loading { display: none; align-items: center; gap: 10px; color: var(--purple-light); font-size: 13px; padding: 8px 0; }
+    .loading.show { display: flex; }
+    .spinner { width: 16px; height: 16px; border: 2px solid var(--purple-border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--purple-bg); border: 0.5px solid var(--purple-border); color: var(--purple-dim); font-size: 12px; padding: 10px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateY(8px); transition: all 0.2s; z-index: 999; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: #1a0d0d; border-color: #4a1010; color: #f87171; }
+
+    /* FOOTER */
+    .footer { display: flex; align-items: center; justify-content: space-between; padding: 11px 28px; border-top: 0.5px solid var(--border); background: var(--bg2); }
+    .footer-tags { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .ftag { font-size: 11px; color: var(--text5); display: flex; align-items: center; gap: 5px; }
+    .ftag i { font-size: 13px; color: var(--purple); }
+    .dl-btn { font-size: 12px; padding: 7px 14px; border: 0.5px solid var(--purple-border); border-radius: 7px; background: var(--purple-bg); color: var(--purple-dim); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; transition: all 0.15s; text-decoration: none; }
+    .dl-btn:hover { background: #251540; }
+    .dl-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+    /* SYNTAX HIGHLIGHT */
+    .kw { color: var(--blue); }
+    .st { color: var(--green); }
+    .fn { color: var(--purple-dim); }
+    .cm { color: var(--text7); }
+    .nm { color: #fb923c; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="ti ti-radar"></i></div>
+      <div><div class="brand-name">APIScout</div></div>
+    </div>
+    <div class="top-pills">
+      <div class="pill"><div class="pill-dot"></div> Gemini 2.5 Flash</div>
+      <div class="pill"><i class="ti ti-database"></i> ChromaDB</div>
+      <div class="pill"><i class="ti ti-brand-python"></i> Python</div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Smart DevTool for API Integration</div>
+      <div class="hero-title">Stop reading docs.<br><span class="dim">Start building faster.</span></div>
+      <div class="hero-sub">Paste any API documentation URL — APIScout scrapes it, extracts every endpoint and auth method using AI, and instantly generates a production-ready Python wrapper with full error handling.</div>
+      <div class="url-bar">
+        <div class="url-ico"><i class="ti ti-link"></i></div>
+        <input class="url-input" id="urlInput" type="text" placeholder="https://your-api-docs.com" />
+        <button class="scout-btn" id="scoutBtn" onclick="scoutAPI()">
+          <i class="ti ti-radar"></i> Scout it
+        </button>
+      </div>
+      <div class="loading" id="loadingMsg">
+        <div class="spinner"></div>
+        <span id="loadingText">Scraping documentation...</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="whats-new-label">What you get</div>
+      <div class="whats-new-item">Extracted endpoints & parameters<span>Structured — ready to use</span></div>
+      <div class="whats-new-item">Auth method detected automatically<span>API Key, OAuth2, Bearer Token</span></div>
+      <div class="whats-new-item">Python wrapper class generated<span>With error handling built-in</span></div>
+      <div class="whats-new-item">Natural language to API call<span>Describe it, get the code</span></div>
+    </div>
+  </div>
+
+  <!-- META BAR -->
+  <div class="meta-bar">
+    <div class="meta-cell">
+      <div class="meta-ico"><i class="ti ti-files"></i></div>
+      <div><div class="meta-val" id="metaPages">—</div><div class="meta-lbl">Pages scraped</div></div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-ico"><i class="ti ti-api"></i></div>
+      <div><div class="meta-val" id="metaEndpoints">—</div><div class="meta-lbl">Endpoints found</div></div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-ico"><i class="ti ti-lock"></i></div>
+      <div><div class="meta-val" id="metaAuth">—</div><div class="meta-lbl">Auth method</div></div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-ico"><i class="ti ti-clock"></i></div>
+      <div><div class="meta-val" id="metaRate">—</div><div class="meta-lbl">Rate limit</div></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="sidebar">
+      <div class="sb-label">Results</div>
+      <div class="sb-item active" onclick="switchTab('endpoints', this)"><i class="ti ti-api"></i> Endpoints <span class="sb-badge" id="epBadge">0</span></div>
+      <div class="sb-item" onclick="switchTab('auth', this)"><i class="ti ti-lock"></i> Authentication</div>
+      <div class="sb-item" onclick="switchTab('wrapper', this)"><i class="ti ti-code"></i> Wrapper code</div>
+      <div class="sb-item" onclick="switchTab('nl', this)"><i class="ti ti-message-code"></i> Ask in english</div>
+      <div class="sb-item" onclick="switchTab('guide', this)"><i class="ti ti-book"></i> Guide</div>
+      <div class="sb-divider"></div>
+      <div class="sb-label">API Details</div>
+      <div class="sb-info"><i class="ti ti-info-circle"></i> <span id="sideApiName">No API scouted</span></div>
+      <div class="sb-info"><i class="ti ti-world"></i> <span id="sideApiDomain">—</span></div>
+      <div class="sb-info"><i class="ti ti-gauge"></i> <span id="sideApiRate">—</span></div>
+    </div>
+
+    <div class="content">
+
+      <!-- ENDPOINTS TAB -->
+      <div class="tab-panel active" id="tab-endpoints">
+        <div class="side-panels">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-api"></i> Endpoints</div>
+              <div class="panel-action" onclick="exportJSON()"><i class="ti ti-download"></i> Export JSON</div>
+            </div>
+            <div class="panel-body" id="endpointsList">
+              <div class="no-data"><i class="ti ti-radar"></i>Scout an API to see endpoints</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title"><i class="ti ti-lock"></i> Authentication</div>
+            </div>
+            <div class="panel-body" id="authSummary">
+              <div class="no-data"><i class="ti ti-lock"></i>Auth info will appear here</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NL PANEL -->
+        <div class="nl-panel">
+          <div class="nl-head"><i class="ti ti-message-code"></i><div class="nl-title">Natural language to API call</div></div>
+          <div class="nl-body">
+            <div class="nl-left">
+              <div class="nl-irow">
+                <input type="text" id="nlInput" placeholder='e.g. "get me the weather for Chennai"' />
+                <button class="nl-btn" onclick="generateNL()"><i class="ti ti-sparkles"></i> Generate</button>
+              </div>
+              <div class="nl-examples" id="nlExamples">
+                <div class="nl-eg" onclick="setNLExample(this)">"get the current data for a specific location"</div>
+                <div class="nl-eg" onclick="setNLExample(this)">"fetch forecast for the next 24 hours"</div>
+              </div>
+            </div>
+            <div class="nl-right">
+              <div class="out-lbl"><i class="ti ti-code"></i> Generated code</div>
+              <pre class="nl-code" id="nlOutput"><span class="cm"># Scout an API first, then ask in plain english</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTH TAB -->
+      <div class="tab-panel" id="tab-auth">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title"><i class="ti ti-lock"></i> Authentication Details</div></div>
+          <div class="panel-body" id="authFull">
+            <div class="no-data"><i class="ti ti-lock"></i>Scout an API to see auth details</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WRAPPER TAB -->
+      <div class="tab-panel" id="tab-wrapper">
+        <div class="code-panel">
+          <div class="code-panel-head">
+            <div class="panel-title"><i class="ti ti-code"></i> Generated Python Wrapper</div>
+            <div class="code-actions">
+              <div class="code-btn" onclick="copyWrapper()"><i class="ti ti-copy"></i> Copy</div>
+              <a class="code-btn primary dl-btn" id="downloadBtn" href="#" onclick="downloadWrapper(event)"><i class="ti ti-download"></i> Download wrapper.py</a>
+            </div>
+          </div>
+          <pre class="code-blk" id="wrapperCode"><span class="cm"># Scout an API first to generate its Python wrapper</span></pre>
+        </div>
+      </div>
+
+      <!-- NL TAB -->
+      <div class="tab-panel" id="tab-nl">
+        <div class="nl-panel" style="margin-top:0">
+          <div class="nl-head"><i class="ti ti-message-code"></i><div class="nl-title">Natural language to API call</div></div>
+          <div class="nl-body">
+            <div class="nl-left">
+              <div class="nl-irow">
+                <input type="text" id="nlInput2" placeholder='Describe what you want in plain english...' />
+                <button class="nl-btn" onclick="generateNL2()"><i class="ti ti-sparkles"></i> Generate</button>
+              </div>
+              <div class="nl-examples" id="nlExamples2">
+                <div class="nl-eg" onclick="setNLExample2(this)">"get the current data for a specific location"</div>
+                <div class="nl-eg" onclick="setNLExample2(this)">"fetch forecast for the next 24 hours"</div>
+              </div>
+            </div>
+            <div class="nl-right">
+              <div class="out-lbl"><i class="ti ti-code"></i> Generated code</div>
+              <pre class="nl-code" id="nlOutput2"><span class="cm"># Scout an API first, then ask in plain english</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GUIDE TAB -->
+      <div class="tab-panel" id="tab-guide">
+        <div class="guide-panel">
+          <div class="guide-head"><i class="ti ti-book"></i><div class="guide-head-title">How to use APIScout — Guide & Expected Outcomes</div></div>
+          <div class="guide-body">
+            <div class="guide-col">
+              <div class="guide-col-title"><i class="ti ti-steps"></i> How to use</div>
+              <div class="guide-step"><div class="step-num">1</div><div class="step-text"><strong>Paste a URL</strong> — any REST API documentation link in the input above</div></div>
+              <div class="guide-step"><div class="step-num">2</div><div class="step-text"><strong>Click Scout it</strong> — APIScout scrapes the docs and runs AI extraction (takes ~30s)</div></div>
+              <div class="guide-step"><div class="step-num">3</div><div class="step-text"><strong>Review endpoints</strong> — all found routes, methods and parameters are listed</div></div>
+              <div class="guide-step"><div class="step-num">4</div><div class="step-text"><strong>Check Wrapper code</strong> — copy or download the generated Python class directly</div></div>
+              <div class="guide-step"><div class="step-num">5</div><div class="step-text"><strong>Ask in english</strong> — describe what you want and get exact Python code instantly</div></div>
+            </div>
+            <div class="guide-col">
+              <div class="guide-col-title"><i class="ti ti-target"></i> Expected outcomes</div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Structured endpoint list</strong> — every route with method, path, and parameters</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Auth method detected</strong> — API Key, Bearer Token, or OAuth2 identified automatically</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Python wrapper class</strong> — typed, documented, production-ready code</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Error handling built-in</strong> — 400, 401, 404, 429, 500 all handled with specific messages</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>NL to code</strong> — plain english query becomes a working API call instantly</div></div>
+            </div>
+            <div class="guide-col">
+              <div class="guide-col-title"><i class="ti ti-bulb"></i> Tips & limitations</div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Best with REST APIs</strong> — works great on OpenWeather, GitHub, Stripe, Twilio docs</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Max 10 pages</strong> — scraper crawls up to 10 linked pages from the URL provided</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>JS-heavy sites</strong> — some docs rendered by JavaScript may have limited extraction</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Generation takes ~30s</strong> — Gemini reads and processes docs before generating</div></div>
+              <div class="outcome-item"><div class="outcome-dot"></div><div class="outcome-text"><strong>Review before use</strong> — always verify the generated wrapper against official docs</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .content -->
+  </div><!-- end .main -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-tags">
+      <div class="ftag"><i class="ti ti-brand-python"></i> Python wrapper</div>
+      <div class="ftag"><i class="ti ti-shield-check"></i> Error handling included</div>
+      <div class="ftag"><i class="ti ti-clock"></i> 10s timeout on all requests</div>
+      <div class="ftag"><i class="ti ti-refresh"></i> Auto retry on rate limits</div>
+    </div>
+    <a class="dl-btn" href="#" onclick="downloadWrapper(event)"><i class="ti ti-download"></i> Download wrapper.py</a>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toastMsg">Copied!</span></div>
+
+  <script>
+    let apiData = null;
+    let wrapperText = '';
+
+    // ─── TAB SWITCHING ───────────────────────────────────────
+    function switchTab(name, el) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      el.classList.add('active');
+    }
+
+    // ─── SCOUT API ───────────────────────────────────────────
+    async function scoutAPI() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url) { showToast('Please enter a documentation URL', true); return; }
+
+      const btn = document.getElementById('scoutBtn');
+      const loading = document.getElementById('loadingMsg');
+      const loadingText = document.getElementById('loadingText');
+
+      btn.disabled = true;
+      loading.classList.add('show');
+
+      const steps = ['Scraping documentation...', 'Embedding content into ChromaDB...', 'Extracting endpoints with Gemini...', 'Generating Python wrapper...'];
+      let step = 0;
+      const stepInterval = setInterval(() => {
+        if (step < steps.length) { loadingText.textContent = steps[step++]; }
+      }, 8000);
+
+      try {
+        const res = await fetch('/scout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        apiData = data.api_info;
+        wrapperText = data.wrapper_code;
+
+        updateUI(data);
+        showToast('API scouted successfully!');
+      } catch (e) {
+        showToast('Error: ' + e.message, true);
+      } finally {
+        btn.disabled = false;
+        loading.classList.remove('show');
+        clearInterval(stepInterval);
+      }
+    }
+
+    // ─── UPDATE UI ───────────────────────────────────────────
+    function updateUI(data) {
+      const info = data.api_info;
+      const endpoints = info.endpoints || [];
+      const auth = info.authentication || {};
+
+      // Meta bar
+      document.getElementById('metaPages').textContent = data.pages_scraped || '?';
+      document.getElementById('metaEndpoints').textContent = endpoints.length;
+      document.getElementById('metaAuth').textContent = auth.type || '—';
+      document.getElementById('metaRate').textContent = info.rate_limits ? info.rate_limits.split(' ').slice(0,3).join(' ') : '—';
+
+      // Sidebar
+      document.getElementById('epBadge').textContent = endpoints.length;
+      document.getElementById('sideApiName').textContent = info.api_name || '—';
+      document.getElementById('sideApiDomain').textContent = info.base_url ? new URL(info.base_url).hostname : '—';
+      document.getElementById('sideApiRate').textContent = info.rate_limits ? info.rate_limits.split('.')[0] : '—';
+
+      // Endpoints
+      const epList = document.getElementById('endpointsList');
+      if (endpoints.length === 0) {
+        epList.innerHTML = '<div class="no-data"><i class="ti ti-api"></i>No endpoints found</div>';
+      } else {
+        epList.innerHTML = endpoints.map(ep => `
+          <div class="ep-row">
+            <div><span class="method ${ep.method.toLowerCase()}">${ep.method}</span></div>
+            <div>
+              <div class="ep-path">${ep.path}</div>
+              <div class="ep-desc">${ep.description}</div>
+              <div class="ep-params">
+                ${(ep.parameters||[]).map(p => `<span class="param ${p.required ? 'req':''}">${p.name}${p.required?'*':''}</span>`).join('')}
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      // Auth summary (sidebar panel)
+      const authHtml = `
+        <div class="auth-block">
+          <div class="auth-type"><i class="ti ti-key"></i> ${auth.type || 'Unknown'}</div>
+          <div class="auth-detail">${auth.description || '—'}</div>
+          ${auth.parameter_name ? `<div class="auth-tag"><i class="ti ti-hash"></i> Parameter: ${auth.parameter_name}</div>` : ''}
+        </div>
+        ${info.rate_limits ? `<div class="auth-block">
+          <div class="auth-type"><i class="ti ti-gauge"></i> Rate limits</div>
+          <div class="auth-detail">${info.rate_limits}</div>
+        </div>` : ''}`;
+      document.getElementById('authSummary').innerHTML = authHtml;
+      document.getElementById('authFull').innerHTML = authHtml;
+
+      // Wrapper code
+      document.getElementById('wrapperCode').innerHTML = highlightCode(data.wrapper_code || '# No wrapper generated');
+
+      // NL examples
+      const exampleQuery = `"get me ${info.api_name || 'data'} for a specific location"`;
+      ['nlExamples', 'nlExamples2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `
+          <div class="nl-eg" onclick="setNLExample(this)">${exampleQuery}</div>
+          <div class="nl-eg" onclick="setNLExample(this)">"list all available endpoints"</div>`;
+      });
+    }
+
+    // ─── GENERATE NL ─────────────────────────────────────────
+    async function generateNL() {
+      const query = document.getElementById('nlInput').value.trim();
+      if (!query) { showToast('Enter a query first', true); return; }
+      if (!apiData) { showToast('Scout an API first', true); return; }
+      document.getElementById('nlOutput').innerHTML = '<span class="cm"># Generating...</span>';
+      try {
+        const res = await fetch('/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query}) });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        document.getElementById('nlOutput').innerHTML = highlightCode(data.code);
+      } catch(e) { document.getElementById('nlOutput').innerHTML = `<span class="cm"># Error: ${e.message}</span>`; }
+    }
+
+    async function generateNL2() {
+      const query = document.getElementById('nlInput2').value.trim();
+      if (!query) { showToast('Enter a query first', true); return; }
+      if (!apiData) { showToast('Scout an API first', true); return; }
+      document.getElementById('nlOutput2').innerHTML = '<span class="cm"># Generating...</span>';
+      try {
+        const res = await fetch('/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query}) });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        document.getElementById('nlOutput2').innerHTML = highlightCode(data.code);
+      } catch(e) { document.getElementById('nlOutput2').innerHTML = `<span class="cm"># Error: ${e.message}</span>`; }
+    }
+
+    function setNLExample(el) { document.getElementById('nlInput').value = el.textContent.replace(/"/g,''); }
+    function setNLExample2(el) { document.getElementById('nlInput2').value = el.textContent.replace(/"/g,''); }
+
+    // ─── UTILITIES ───────────────────────────────────────────
+    function highlightCode(code) {
+      return code
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/(#.*)/g, '<span class="cm">$1</span>')
+        .replace(/\b(import|from|class|def|self|return|if|elif|else|raise|try|except|for|in|not|and|or|True|False|None|with|as)\b/g, '<span class="kw">$1</span>')
+        .replace(/"""([\s\S]*?)"""/g, '<span class="st">"""$1"""</span>')
+        .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, '<span class="st">$1</span>')
+        .replace(/\b(\d+)\b/g, '<span class="nm">$1</span>');
+    }
+
+    function exportJSON() {
+      if (!apiData) { showToast('Scout an API first', true); return; }
+      const blob = new Blob([JSON.stringify(apiData, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'api_info.json'; a.click();
+    }
+
+    function copyWrapper() {
+      if (!wrapperText) { showToast('No wrapper generated yet', true); return; }
+      navigator.clipboard.writeText(wrapperText).then(() => showToast('Wrapper copied to clipboard!'));
+    }
+
+    function downloadWrapper(e) {
+      e.preventDefault();
+      if (!wrapperText) { showToast('Scout an API first', true); return; }
+      const blob = new Blob([wrapperText], { type: 'text/plain' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'wrapper.py'; a.click();
+    }
+
+    function showToast(msg, isError=false) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '') + ' show';
+      setTimeout(() => t.className = 'toast' + (isError ? ' error' : ''), 3000);
+    }
+
+    // Enter key support
+    document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') scoutAPI(); });
+  </script>
+</body>
+</html>

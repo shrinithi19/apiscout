@@ -3,10 +3,13 @@ from dotenv import load_dotenv
 import os
 import json
 import time
+from utils.key_manager import key_manager
 
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
+def get_client():
+    """Gets a Gemini client with the next available API key"""
+    return genai.Client(api_key=key_manager.get_next_key())
 
 def extract_api_info(chunks: list[str]) -> dict:
     """
@@ -53,7 +56,7 @@ Return ONLY the JSON object, no explanation, no markdown, no extra text.
 
     for attempt in range(3):
         try:
-            response = client.models.generate_content(
+            response = get_client().models.generate_content(
                 model="gemini-2.5-flash",
                 contents=prompt
             )

@@ -2,9 +2,12 @@ from google import genai
 from dotenv import load_dotenv
 import os
 import time
+from utils.key_manager import key_manager
 
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+def get_client():
+    return genai.Client(api_key=key_manager.get_next_key())
 
 
 def generate_wrapper(api_info: dict) -> str:
@@ -58,7 +61,7 @@ Generate ONLY the Python code, no explanation, no markdown backticks.
 
     for attempt in range(3):
         try:
-            response = client.models.generate_content(
+            response = get_client().models.generate_content(
                 model="gemini-2.5-flash",
                 contents=prompt
             )
@@ -105,7 +108,7 @@ Generate ONLY the Python code, no explanation, no markdown backticks.
 
     for attempt in range(3):
         try:
-            response = client.models.generate_content(
+            response = get_client().models.generate_content(
                 model="gemini-2.5-flash",
                 contents=prompt
             )

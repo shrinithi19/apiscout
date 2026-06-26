@@ -67,7 +67,7 @@ Generate ONLY the Python code, no explanation, no markdown backticks.
 
         except Exception as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e) or "503" in str(e) or "UNAVAILABLE" in str(e):
-                wait = (attempt + 1) * 15
+                wait = (attempt + 1) * 5
                 print(f"Rate limited. Waiting {wait} seconds...")
                 time.sleep(wait)
             else:
@@ -106,23 +106,27 @@ Generate ONLY the Python code, no explanation, no markdown backticks.
 
     for attempt in range(3):
         try:
-            response = get_client().models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
+            client = get_client()
+            response = client.generate_content(prompt)
             return response.text.strip()
 
         except Exception as e:
-            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e) or "503" in str(e) or "UNAVAILABLE" in str(e):
-                wait = (attempt + 1) * 15
-                print(f"Rate limited. Waiting {wait} seconds...")
+            error_str = str(e)
+            print(f"NL attempt {attempt + 1} failed: {error_str[:100]}")
+
+            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                wait = 5 * (attempt + 1)
+                print(f"Rate limited. Waiting {wait}s...")
+                time.sleep(wait)
+            elif "503" in error_str or "UNAVAILABLE" in error_str:
+                wait = 3 * (attempt + 1)
+                print(f"Unavailable. Waiting {wait}s...")
                 time.sleep(wait)
             else:
-                print(f"Error: {e}")
-                return ""
+                print(f"Non-retryable error: {error_str[:200]}")
+                return f"# Error: {error_str[:100]}"
 
-    return ""
-
+    return "# Could not generate code after 3 attempts. Please try again."
 
 if __name__ == "__main__":
     import sys

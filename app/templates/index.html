@@ -552,11 +552,17 @@
 
     // ─── TAB SWITCHING ───────────────────────────────────────
     function switchTab(name, el) {
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
-      document.getElementById('tab-' + name).classList.add('active');
-      el.classList.add('active');
-    }
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+  }
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    const panel = document.getElementById('tab-' + name);
+    panel.classList.add('active');
+    panel.style.display = 'block';
+    el.classList.add('active');
+       
 
     // ─── SCOUT API ───────────────────────────────────────────
     async function scoutAPI() {
@@ -614,7 +620,7 @@
       document.getElementById('metaEndpoints').textContent = endpoints.length;
       document.getElementById('metaAuth').textContent = auth.type || '—';
       document.getElementById('metaRate').textContent = info.rate_limits ? info.rate_limits.split(' ').slice(0,3).join(' ') : '—';
-
+     
       // Sidebar
       document.getElementById('epBadge').textContent = endpoints.length;
       document.getElementById('sideApiName').textContent = info.api_name || '—';
@@ -656,6 +662,7 @@
       // Wrapper code
       const rawCode = data.wrapper_code || '# No wrapper generated';
       document.getElementById('wrapperCode').innerHTML = highlightCode(rawCode);
+
       // NL examples
       const exampleQuery = `"get me ${info.api_name || 'data'} for a specific location"`;
       ['nlExamples', 'nlExamples2'].forEach(id => {

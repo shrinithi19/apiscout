@@ -86,8 +86,13 @@ def generate_nl_to_api(api_info: dict, user_query: str) -> str:
     for ep in api_info.get("endpoints", []):
         endpoints_description += f"- {ep['method']} {ep['path']}: {ep['description']}\n"
 
+    api_name = api_info.get("api_name") or "the API"
+    class_name = api_name.replace(" ", "").replace("-", "") + "Client"
+
     prompt = f"""
-You are an expert Python developer working with the {api_info.get("api_name")}.
+You are an expert Python developer working with the {api_name}.
+
+The wrapper class is already imported and named: {class_name}
 
 Available endpoints:
 {endpoints_description}
@@ -95,7 +100,7 @@ Available endpoints:
 User request: "{user_query}"
 
 Based on the user's request, generate ONLY the Python code snippet that:
-1. Creates an instance of the wrapper class (assume it's already imported as the class name)
+1. Creates an instance of {class_name} (already imported)
 2. Calls the correct method with appropriate parameters
 3. Prints or returns the result
 4. Includes a comment explaining what the code does

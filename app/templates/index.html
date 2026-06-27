@@ -683,7 +683,7 @@
         const res = await fetch('/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query}) });
         const data = await res.json();
         if (data.error) throw new Error(data.error);
-        document.getElementById('nlOutput').innerHTML = highlightCode(data.code);
+        document.getElementById('nlOutput').innerText = data.code;
       } catch(e) { document.getElementById('nlOutput').innerHTML = `<span class="cm"># Error: ${e.message}</span>`; }
     }
 
@@ -696,7 +696,7 @@
         const res = await fetch('/ask', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({query}) });
         const data = await res.json();
         if (data.error) throw new Error(data.error);
-        document.getElementById('nlOutput2').innerHTML = highlightCode(data.code);
+        document.getElementById('nlOutput2').innerText = data.code;
       } catch(e) { document.getElementById('nlOutput2').innerHTML = `<span class="cm"># Error: ${e.message}</span>`; }
     }
 

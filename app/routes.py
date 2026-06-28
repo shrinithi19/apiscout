@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template
-import sys, os, time
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import os, time
 
 from scraper import scrape_docs
 from embedder import store_in_chromadb, query_collection

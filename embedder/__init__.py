@@ -1,4 +1,5 @@
 import chromadb
+from chromadb.utils import embedding_functions
 
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
     words = text.split()
@@ -14,13 +15,18 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]
 def store_in_chromadb(pages_content: dict, collection_name: str = "apiscout") -> chromadb.Collection:
     client = chromadb.Client()
 
+    embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name="all-MiniLM-L6-v2"
+    )
+
     try:
         client.delete_collection(collection_name)
     except:
         pass
 
     collection = client.create_collection(
-        name=collection_name
+        name=collection_name,
+        embedding_function=embedding_fn
     )
 
     doc_id = 0

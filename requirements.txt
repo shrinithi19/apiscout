@@ -3,6 +3,7 @@ requests
 beautifulsoup4
 chromadb
 google-generativeai
+sentence-transformers
 python-dotenv
 lxml
 gunicorn

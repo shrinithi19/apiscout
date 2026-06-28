@@ -16,6 +16,12 @@ APIScout is an AI-powered developer tool that eliminates the need to manually re
 
 ---
 
+## 🎬 Demo Video
+
+[![APIScout Demo](https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube)](YOUR_YOUTUBE_LINK_HERE)
+
+---
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
@@ -187,6 +193,12 @@ gunicorn
 - JavaScript-rendered documentation may have limited extraction
 - Generation takes ~30 seconds due to scraping + AI processing
 - Free Gemini API tier has rate limits (mitigated with round-robin key manager)
+
+---
+
+## Colab Notebook
+
+**Colab Notebook:** https://colab.research.google.com/drive/1m1Oxg5vkNQv0uf8tzFjbZTDfqDtsCSJV?usp=sharing
 
 ---
 

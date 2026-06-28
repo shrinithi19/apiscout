@@ -18,7 +18,7 @@ APIScout is an AI-powered developer tool that eliminates the need to manually re
 
 ## 🎬 Demo Video
 
-[![APIScout Demo](https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube)](YOUR_YOUTUBE_LINK_HERE)
+[![APIScout Demo](https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube)](https://youtu.be/6Z6w1DtIQo4)
 
 ---
 

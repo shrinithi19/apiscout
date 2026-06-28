@@ -4,6 +4,5 @@ beautifulsoup4
 chromadb
 google-generativeai
 python-dotenv
-sentence-transformers
 lxml
 gunicorn
